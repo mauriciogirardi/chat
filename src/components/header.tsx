@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 import { useAppDispatch } from '@/redux'
-import { loadCurrentUser } from '@/redux/slices/userSlice'
+import { loadCurrentUser } from '@/redux/slices/user-slice'
 
 import { Logo } from './logo'
 import { Profile } from './profile'
@@ -14,8 +14,7 @@ export function Header() {
 
   useEffect(() => {
     dispatch(loadCurrentUser())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [dispatch])
 
   return (
     <div className="border border-b-zinc-200 bg-primary-foreground dark:border-b-zinc-700">

@@ -27,12 +27,15 @@ export function Profile() {
       ) : (
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium md:text-base">
-            {currentUserData?.username}
+            {currentUserData?.name || currentUserData?.username}
           </p>
           <ProfileInfo>
-            <div className="group relative bg-transparent">
+            <div className="group relative rounded-full">
               <Avatar role="button" aria-label="Open profile">
-                <AvatarImage src={currentUserData?.profilePicture} />
+                <AvatarImage
+                  src={currentUserData?.profilePicture}
+                  className="object-cover"
+                />
               </Avatar>
               <Settings className="absolute -bottom-1 -right-1 h-4 w-4 text-zinc-800 group-hover:opacity-80 dark:text-zinc-100" />
             </div>

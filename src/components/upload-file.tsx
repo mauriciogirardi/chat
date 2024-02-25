@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 
 import { storageUpload } from '@/config/firebase'
 import { useAppSelector } from '@/redux'
-import { setCurrentUser } from '@/redux/slices/userSlice'
+import { setCurrentUser } from '@/redux/slices/user-slice'
 import { UploadUserProfile } from '@/server-actions/users'
 
 import { Avatar, AvatarImage } from './ui/avatar'

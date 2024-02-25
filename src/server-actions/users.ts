@@ -3,11 +3,12 @@
 import { currentUser } from '@clerk/nextjs'
 
 import { connectMongoDB } from '@/config/db-config'
-import UserModel from '@/models/user-models'
+import { UserType } from '@/interfaces/user'
+import UserModel from '@/models/user-model'
 
 connectMongoDB()
 
-export const GetCurrentUserFromMongoDB = async () => {
+export const GetCurrentUserFromMongoDB = async (): Promise<UserType | null> => {
   try {
     const clerkUser = await currentUser()
     const alreadyUserExistis = await UserModel.findOne({
@@ -18,32 +19,34 @@ export const GetCurrentUserFromMongoDB = async () => {
       return JSON.parse(JSON.stringify(alreadyUserExistis))
     }
 
-    if (clerkUser) {
-      const { id, firstName, lastName, username, emailAddresses, imageUrl } =
-        clerkUser
-
-      const fullName = firstName + '' + lastName
-
-      const newUserPayload = {
-        clerkUserId: id,
-        name: fullName.replaceAll('null', ''),
-        username,
-        email: emailAddresses[0]?.emailAddress || '',
-        profilePicture: imageUrl,
-      }
-
-      const newUser = await UserModel.create(newUserPayload)
-      return JSON.parse(JSON.stringify(newUser))
+    if (!clerkUser) {
+      throw new Error('ClerkUser not existis!')
     }
+
+    const { id, firstName, lastName, username, emailAddresses, imageUrl } =
+      clerkUser
+
+    const fullName = firstName + ' ' + lastName
+
+    const newUserPayload = {
+      clerkUserId: id,
+      name: fullName.replaceAll('null', ''),
+      username,
+      email: emailAddresses[0]?.emailAddress || '',
+      profilePicture: imageUrl,
+    }
+
+    const newUser = await UserModel.create(newUserPayload)
+    return JSON.parse(JSON.stringify(newUser))
   } catch (error) {
     throw error
   }
 }
 
-export const GetAllUsers = async () => {
+export const GetAllUsers = async (): Promise<UserType[]> => {
   try {
     const users = await UserModel.find()
-    return users
+    return JSON.parse(JSON.stringify(users))
   } catch (error) {
     throw error
   }
@@ -57,7 +60,7 @@ type UploadUserProfileProps = {
 export const UploadUserProfile = async ({
   profilePicture,
   userId,
-}: UploadUserProfileProps) => {
+}: UploadUserProfileProps): Promise<UserType> => {
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,

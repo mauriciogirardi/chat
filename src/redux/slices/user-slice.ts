@@ -4,8 +4,8 @@ import { UserType } from '@/interfaces/user'
 import { GetCurrentUserFromMongoDB } from '@/server-actions/users'
 
 export type CurrentUserState = {
-  currentUserData: UserType | null
-  currentUserId: string
+  currentUserData?: UserType | null
+  currentUserId?: string
   isLoading: boolean
 }
 
@@ -15,7 +15,7 @@ const initialState: CurrentUserState = {
   isLoading: true,
 }
 
-export const loadCurrentUser = createAsyncThunk<UserType>(
+export const loadCurrentUser = createAsyncThunk<UserType | null | undefined>(
   'user/load',
   async () => {
     try {
@@ -36,7 +36,7 @@ const userSlice = createSlice({
       state.currentUserData = action.payload
     },
 
-    setCurrentId: (state, action) => {
+    setCurrentId: (state, action: PayloadAction<string>) => {
       state.currentUserId = action.payload
     },
   },
@@ -48,7 +48,7 @@ const userSlice = createSlice({
 
     builder.addCase(loadCurrentUser.fulfilled, (state, action) => {
       state.currentUserData = action.payload
-      state.currentUserId = action.payload.clerkUserId
+      state.currentUserId = action.payload?._id
       state.isLoading = false
     })
   },
