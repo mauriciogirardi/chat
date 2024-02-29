@@ -7,7 +7,9 @@ import { useRouter } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useAppSelector } from '@/redux'
+import { useAppDispatch, useAppSelector } from '@/redux'
+import { setSelectedChat } from '@/redux/slices/chat-slice'
+import { setCurrentId, setCurrentUser } from '@/redux/slices/user-slice'
 
 import { Button } from './ui/button'
 import * as D from './ui/drawer'
@@ -19,6 +21,7 @@ type ProfileInfoProps = {
 
 export function ProfileInfo({ children }: ProfileInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useAppDispatch()
 
   const user = useAppSelector((state) => state.user.currentUserData)
 
@@ -29,6 +32,11 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
     try {
       setIsLoading(true)
       await signOut()
+
+      dispatch(setSelectedChat(null))
+      dispatch(setCurrentUser(null))
+      dispatch(setCurrentId(''))
+
       toast.success('logged out successfully!')
       router.push('/sign-in')
     } catch {
@@ -66,7 +74,7 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
             <Label label="Your Username" value={user?.username} />
             <Label label="Your ID" value={user?.clerkUserId} />
             <Label
-              label="Your ID"
+              label="Created on"
               value={
                 user?.createdAt
                   ? format(user.createdAt, "dd MMMM yyyy ',' p")

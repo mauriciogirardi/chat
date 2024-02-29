@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 import { twMerge } from 'tailwind-merge'
 
+import { getAllUsers } from '@/api/get-all-users'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,7 +22,6 @@ import { UserType } from '@/interfaces/user'
 import { useAppSelector } from '@/redux'
 import { loadChats } from '@/redux/slices/chat-slice'
 import { CreateNewChat } from '@/server-actions/chats'
-import { GetAllUsers } from '@/server-actions/users'
 
 export function NewChatModal() {
   const currentUserId = useAppSelector((state) => state.user.currentUserId)
@@ -36,7 +36,7 @@ export function NewChatModal() {
   const getUsers = async () => {
     try {
       setIsLoadingUsers(true)
-      const response = await GetAllUsers()
+      const response = (await getAllUsers()) || []
       setUsers(response)
     } catch (error) {
       toast.error('Fail loading users!')
@@ -98,10 +98,7 @@ export function NewChatModal() {
           <Input placeholder="Search userId or username or email" type="text" />
 
           <div
-            className={twMerge(
-              'mt-6 h-72',
-              'dark:scrollbar-thumb-zinc-700 scrollbar-thin dark:scrollbar-track-zinc-800 overflow-y-auto',
-            )}
+            className={twMerge('mt-6 h-72', 'overflow-y-auto scrollbar-thin')}
           >
             {isLoadingList ? (
               <div className="divide-y">

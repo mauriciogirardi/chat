@@ -1,19 +1,36 @@
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
-import { getAllUsers } from '@/api/get-all-users'
 import { LayoutApp } from '@/layouts/app'
+import { GetChatDataById } from '@/server-actions/chats'
+import { GetAllUsers } from '@/server-actions/users'
 
-import { FormGroup } from '../_group-components/form-group'
+import { FormGroup } from '../../_group-components/form-group'
 
-export default async function CreateGroup() {
-  const users = await getAllUsers()
+type EditGroupProps = {
+  params: {
+    groupId: string
+  }
+}
+
+export default async function EditGroup({ params }: EditGroupProps) {
+  const { groupId } = params
+
+  if (!groupId) {
+    return redirect('/')
+  }
+
+  const [chat, users] = await Promise.all([
+    GetChatDataById(groupId),
+    GetAllUsers(),
+  ])
 
   return (
     <LayoutApp className="py-5">
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:pb-4">
         <h1 className="text-2xl font-bold text-muted-foreground">
-          Create Group Chat
+          Edit Group Chat
         </h1>
 
         <Link
@@ -26,7 +43,7 @@ export default async function CreateGroup() {
       </div>
 
       <div className="mt-6">
-        <FormGroup users={users} />
+        <FormGroup users={users} initialData={chat} />
       </div>
     </LayoutApp>
   )

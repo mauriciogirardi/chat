@@ -58,6 +58,9 @@ const config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      scrollbars: {
+        thin: 'scrollbar-thin dark:scrollbar-track-zinc-800 dark:scrollbar-thumb-zinc-700',
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

@@ -1,4 +1,10 @@
-import { deleteModel, Document, model, models, Schema } from 'mongoose'
+import mongoose, {
+  deleteModel,
+  Document,
+  model,
+  models,
+  Schema,
+} from 'mongoose'
 
 interface ChatData extends Document {
   users: Schema.Types.ObjectId[]
@@ -56,6 +62,10 @@ const chatSchema = new Schema<ChatData>(
 
 if (models && models.chats) {
   deleteModel('chats')
+}
+
+if (!mongoose.models.messages) {
+  require('./message-model')
 }
 
 const ChatModel = model<ChatData>('chats', chatSchema)

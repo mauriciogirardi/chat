@@ -8,4 +8,6 @@ export type MessageType = {
   readBy: UserType[]
   text: string
   image: string
+  createdAt?: string
+  updatedAt?: string
 }

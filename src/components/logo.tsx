@@ -11,10 +11,10 @@ export function Logo({ className }: LogoProps) {
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 51 49"
-        className={twMerge('size-9 md:size-10', className)}
+        className={twMerge(className, 'size-9 md:size-10')}
       >
         <path
-          stroke="#6741D2"
+          stroke="#8c59e5"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"

@@ -6,11 +6,18 @@ import { twMerge } from 'tailwind-merge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { loadChats } from '@/redux/slices/chat-slice'
+import { ReadAllMessages } from '@/server-actions/messages'
 
 import { ChatCard } from './chat-card'
 
-export function ChatList() {
-  const { chats, isLoadingChats } = useAppSelector((state) => state.chat)
+type ChatListProps = {
+  onOpenChats?: (open: boolean) => void
+}
+
+export function ChatList({ onOpenChats }: ChatListProps) {
+  const { chats, isLoadingChats, selectedChat } = useAppSelector(
+    (state) => state.chat,
+  )
   const currentUserId = useAppSelector((state) => state.user.currentUserId)
   const dispatch = useAppDispatch()
 
@@ -20,11 +27,18 @@ export function ChatList() {
     }
   }, [currentUserId, dispatch])
 
+  useEffect(() => {
+    if (currentUserId && selectedChat?._id) {
+      selectedChat?._id &&
+        ReadAllMessages({ chatId: selectedChat._id, userId: currentUserId })
+    }
+  }, [selectedChat?._id, currentUserId])
+
   return (
     <div
       className={twMerge(
         'mt-8 h-[calc(100%_-_6.8rem)] divide-y divide-zinc-200/70 pr-6 dark:divide-zinc-900',
-        'dark:scrollbar-thumb-zinc-700 scrollbar-thin dark:scrollbar-track-zinc-800 overflow-y-auto',
+        'overflow-y-auto scrollbar-thin',
       )}
     >
       {isLoadingChats &&
@@ -40,7 +54,9 @@ export function ChatList() {
         ))}
 
       {!isLoadingChats &&
-        chats.map((chat) => <ChatCard key={chat._id} chat={chat} />)}
+        chats.map((chat) => (
+          <ChatCard key={chat._id} chat={chat} onOpenChats={onOpenChats} />
+        ))}
     </div>
   )
 }

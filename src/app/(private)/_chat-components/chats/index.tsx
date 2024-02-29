@@ -1,6 +1,7 @@
 'use client'
 
-import { Menu, X } from 'lucide-react'
+import { MessageSquareText, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import * as D from '@/components/ui/drawer'
@@ -9,18 +10,34 @@ import { ChatHeader } from './chat-header'
 import { ChatList } from './chat-list'
 
 export function Chats() {
+  const [openChats, setChats] = useState(false)
+
+  const handleOpenChangeChats = useCallback(
+    (open: boolean) => setChats(open),
+    [],
+  )
+
   return (
-    <div className=" h-full w-full max-w-[400px] py-6 dark:border-r-zinc-800 lg:border-r lg:border-r-zinc-200">
+    <div className="h-full dark:border-r-zinc-800 lg:w-full lg:max-w-[400px] lg:border-r lg:border-r-zinc-200 lg:py-6">
       <div className="hidden lg:block">
         <ChatHeader />
         <ChatList />
       </div>
 
-      <div className="lg:hidden">
-        <D.Drawer direction="left">
+      <div className="absolute right-6 top-[95px] z-20 lg:hidden">
+        <D.Drawer
+          direction="left"
+          onOpenChange={handleOpenChangeChats}
+          open={openChats}
+        >
           <D.DrawerTrigger asChild>
-            <Button variant="ghost" type="button" size="icon">
-              <Menu className="size-8 text-muted-foreground" />
+            <Button
+              variant="secondary"
+              type="button"
+              size="icon"
+              className="rounded-full"
+            >
+              <MessageSquareText className="size-6" />
             </Button>
           </D.DrawerTrigger>
 
@@ -32,7 +49,7 @@ export function Chats() {
             </D.DrawerHeader>
 
             <ChatHeader />
-            <ChatList />
+            <ChatList onOpenChats={handleOpenChangeChats} />
           </D.DrawerContent>
         </D.Drawer>
       </div>

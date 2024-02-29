@@ -5,7 +5,7 @@ import { MessageType } from '@/interfaces/message'
 
 import ChatModel from '../models/chat-model'
 
-type CreateChat = {
+export type ChatData = {
   users: string[]
   createdBy: string
   isGroupChat?: boolean
@@ -17,7 +17,7 @@ type CreateChat = {
   unreadCounts?: object
 }
 
-export const CreateNewChat = async (data: CreateChat): Promise<ChatType> => {
+export const CreateNewChat = async (data: ChatData): Promise<ChatType> => {
   try {
     await ChatModel.create(data)
     const newChats = await ChatModel.find({
@@ -41,8 +41,36 @@ export const GetAllChats = async (userId: string): Promise<ChatType[]> => {
       },
     })
       .populate('users')
+      .populate('lastMessage')
+      .populate('createdBy')
+      .populate({ path: 'lastMessage', populate: { path: 'sender' } })
       .sort({ updatedAt: -1 })
     return JSON.parse(JSON.stringify(usersChat))
+  } catch (error) {
+    throw error
+  }
+}
+
+export const GetChatDataById = async (chatId: string): Promise<ChatType> => {
+  try {
+    const usersChat = await ChatModel.findById(chatId)
+      .populate('users')
+      .populate('lastMessage')
+      .populate('createdBy')
+      .populate({ path: 'lastMessage', populate: { path: 'sender' } })
+      .sort({ updatedAt: -1 })
+    return JSON.parse(JSON.stringify(usersChat))
+  } catch (error) {
+    throw error
+  }
+}
+
+export const UpdateChat = async (
+  chatId: string,
+  chat: ChatData,
+): Promise<void> => {
+  try {
+    await ChatModel.findByIdAndUpdate(chatId, chat)
   } catch (error) {
     throw error
   }
