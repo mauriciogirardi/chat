@@ -1,13 +1,30 @@
 'use client'
 
 import Link from 'next/link'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDebounce } from '@/hooks/useDebounce'
+import { useAppDispatch } from '@/redux'
+import { setSearchFilter } from '@/redux/slices/search-slice'
 
 import { NewChatModal } from './new-chat-modal'
 
 export function ChatHeader() {
+  const [search, setSearch] = useState('')
+  const dispatch = useAppDispatch()
+  const debouncedSearch = useDebounce(search)
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
+    setSearch(value)
+  }
+
+  useEffect(() => {
+    dispatch(setSearchFilter(debouncedSearch))
+  }, [debouncedSearch, dispatch])
+
   return (
     <div className="flex flex-col gap-6 pr-6">
       <div className="flex items-center justify-between">
@@ -19,7 +36,12 @@ export function ChatHeader() {
           </Button>
         </div>
       </div>
-      <Input placeholder="Search chat..." type="text" />
+      <Input
+        placeholder="Search chat..."
+        type="text"
+        onChange={handleChange}
+        value={search}
+      />
     </div>
   )
 }

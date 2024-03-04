@@ -13,13 +13,12 @@ type ChatCardProps = {
 }
 
 export function ChatCard({ chat, onOpenChats }: ChatCardProps) {
-  const currentUserId = useAppSelector((state) => state.user.currentUserId)
-  const selectedChatId = useAppSelector((state) => state.chat.selectedChat?._id)
   const dispatch = useAppDispatch()
 
-  const isSelectedCard = chat._id === selectedChatId
+  const { currentUserData, onlineUsers } = useAppSelector((state) => state.user)
+  const { selectedChat } = useAppSelector((state) => state.chat)
 
-  const chatDetails = useMemo(() => {
+  const infoChat = useMemo(() => {
     let name
     let image
     let lastMessage
@@ -27,23 +26,26 @@ export function ChatCard({ chat, onOpenChats }: ChatCardProps) {
     let lastMessageTime = ''
 
     if (chat.isGroupChat) {
-      name = chat.groupName || ''
-      image = chat.groupProfilePicture || ''
+      name = chat.groupName
+      image = chat.groupProfilePicture
     } else {
-      const recipient = chat.users.find((user) => user._id !== currentUserId)
-      name = recipient?.name || ''
-      image = recipient?.profilePicture || ''
+      const recipient = chat.users.find(
+        (user) => user._id !== currentUserData?._id,
+      )
+      name = recipient?.name
+      image = recipient?.profilePicture
     }
 
-    if (chat.lastMessage) {
-      const { text, sender, createdAt } = chat.lastMessage
-      const firstNameSender = sender.name.split(' ')[0]
-
-      lastMessage = text
+    if (chat?.lastMessage) {
+      lastMessage = chat?.lastMessage?.text
       lastMessageSenderName =
-        sender._id === currentUserId ? 'You' : firstNameSender
-      lastMessageTime = createdAt
-        ? formatDistanceToNow(new Date(createdAt))
+        chat?.lastMessage?.sender?._id === currentUserData?._id
+          ? 'You :'
+          : `${chat?.lastMessage?.sender?.name}: `
+      lastMessageTime = chat?.lastMessage?.createdAt
+        ? formatDistanceToNow(new Date(chat.lastMessage.createdAt), {
+            addSuffix: true,
+          })
         : ''
     }
 
@@ -53,29 +55,50 @@ export function ChatCard({ chat, onOpenChats }: ChatCardProps) {
       lastMessage,
       lastMessageSenderName,
       lastMessageTime,
-      fallbackImage: name.slice(0, 1),
+      fallbackImage: name?.slice(0, 2),
     }
-  }, [chat, currentUserId])
+  }, [
+    chat.groupName,
+    chat.groupProfilePicture,
+    chat.isGroupChat,
+    chat.lastMessage,
+    chat.users,
+    currentUserData?._id,
+  ])
 
-  const handleSelectChat = async () => {
+  const isSelected = selectedChat?._id === chat._id
+
+  const handleSelectChat = () => {
     dispatch(setSelectedChat(chat))
     onOpenChats?.(false)
   }
 
   const unreadCounts = () => {
+    if (!currentUserData) return null
     if (
-      !currentUserId ||
       !chat?.unreadCounts ||
-      !chat?.unreadCounts[currentUserId]
+      !chat?.unreadCounts[currentUserData._id] ||
+      isSelected
     ) {
       return null
     }
 
     return (
       <span className="absolute left-12 top-3 rounded-full bg-lime-500 px-2 py-[2px] text-xs font-bold text-zinc-900">
-        {chat.unreadCounts[currentUserId]}
+        {chat.unreadCounts[currentUserData._id]}
       </span>
     )
+  }
+
+  const onlineIndicator = () => {
+    if (chat.isGroupChat) return null
+    const recipientId = chat.users.find(
+      (user) => user._id !== currentUserData?._id,
+    )?._id
+
+    if (recipientId && onlineUsers.includes(recipientId)) {
+      return <div className="h-2 w-2 rounded-full bg-lime-500" />
+    }
   }
 
   return (
@@ -83,30 +106,34 @@ export function ChatCard({ chat, onOpenChats }: ChatCardProps) {
       type="button"
       className={twMerge(
         'relative flex w-full items-center gap-5 rounded p-4 transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800',
-        isSelectedCard && 'bg-zinc-100 dark:bg-zinc-800',
+        isSelected && 'bg-zinc-100 dark:bg-zinc-800',
       )}
       onClick={handleSelectChat}
+      disabled={isSelected}
     >
       <Avatar className="size-12">
-        <AvatarImage src={chatDetails.image} className="object-cover" />
+        <AvatarImage src={infoChat.image} className="object-cover" />
         <AvatarFallback className="uppercase">
-          {chatDetails.fallbackImage}
+          {infoChat.fallbackImage}
         </AvatarFallback>
       </Avatar>
+
       <div className="flex flex-col items-start gap-1">
-        <span className="text-sm font-medium">{chatDetails.name}</span>
-        {chatDetails.lastMessageSenderName && chatDetails.lastMessageTime && (
+        <span className="flex items-center gap-1 text-sm font-medium">
+          {infoChat.name} {onlineIndicator()}
+        </span>
+        {infoChat.lastMessageSenderName && (
           <span className="w-[150px] truncate text-left text-xs text-muted-foreground">
             <strong className="font-medium">
-              {chatDetails.lastMessageSenderName}:{' '}
+              {infoChat.lastMessageSenderName}{' '}
             </strong>
-            {chatDetails.lastMessage}
+            {infoChat.lastMessage}
           </span>
         )}
       </div>
 
       <p className="ml-auto text-right text-xs text-muted-foreground">
-        {chatDetails.lastMessageTime}
+        {infoChat.lastMessageTime}
       </p>
 
       {unreadCounts()}

@@ -16,6 +16,7 @@ interface ChatData extends Document {
   groupBio: string
   groupAdmins: Schema.Types.ObjectId[]
   unreadCounts: object
+  lastMessageAt: string
 }
 
 const chatSchema = new Schema<ChatData>(
@@ -55,6 +56,10 @@ const chatSchema = new Schema<ChatData>(
     unreadCounts: {
       type: Object,
       default: {},
+    },
+    lastMessageAt: {
+      type: String,
+      default: '',
     },
   },
   { timestamps: true },

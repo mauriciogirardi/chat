@@ -11,8 +11,8 @@ export type ChatType = {
   groupProfilePicture?: string
   groupBio?: string
   groupAdmins?: UserType[]
-  createdAt?: string
-  updatedAt?: string
+  createdAt: string
+  updatedAt: string
   unreadCounts?: {
     [key: string]: number
   }

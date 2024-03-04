@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
+import { socket } from '@/config/socket-config'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { setSelectedChat } from '@/redux/slices/chat-slice'
 import { setCurrentId, setCurrentUser } from '@/redux/slices/user-slice'
@@ -31,6 +32,7 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
   async function handleSignOut() {
     try {
       setIsLoading(true)
+      socket.emit('logout', user?._id)
       await signOut()
 
       dispatch(setSelectedChat(null))
@@ -50,7 +52,7 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
 
   return (
     <D.Drawer direction="left">
-      <D.DrawerTrigger asChild className="cursor-pointer bg-foreground">
+      <D.DrawerTrigger asChild className="cursor-pointer">
         {children}
       </D.DrawerTrigger>
 

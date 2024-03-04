@@ -16,7 +16,7 @@ export async function uploadImageToFirebaseAndReturnURL({
   nameFile,
 }: storeUploadFileProps) {
   try {
-    if (!file || !userId) return ''
+    if (!file) return ''
 
     const storageRef = ref(storageUpload, `files/${nameFile || userId}`)
     const uploadedImageResponse = await uploadBytes(storageRef, file)

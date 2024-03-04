@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { uploadImageToFirebaseAndReturnURL } from '@/helpers/uploadImageToFirebaseAndReturnURL.ts'
+import { uploadImageToFirebaseAndReturnURL } from '@/helpers/upload-image-to-firebase-and-return-URL.ts'
 import { ChatType } from '@/interfaces/chat'
 import { UserType } from '@/interfaces/user'
 import { useAppDispatch, useAppSelector } from '@/redux'
@@ -122,7 +122,7 @@ export function FormGroup({ users = [], initialData }: FormGroupProps) {
     }
   }
 
-  if (!users || !initialData || !currentUserId) {
+  if (!users && !initialData && !currentUserId) {
     return <SkeletonForm />
   }
 

@@ -8,6 +8,10 @@ export type SendNewMessagePayload = {
   image?: string
   chat: string
   sender: string
+  readBy?: string[]
+  socketMessageId: string
+  createdAt: string
+  updatedAt: string
 }
 
 type ReadAllMessagesPramas = {
@@ -18,6 +22,7 @@ type ReadAllMessagesPramas = {
 export const SendNewMessage = async (data: SendNewMessagePayload) => {
   try {
     const newMessage = new MessageModel(data)
+    await newMessage.save()
 
     const existingChat = await ChatModel.findById(data.chat)
     const existingUnreadCounts = existingChat?.unreadCounts as {
@@ -33,10 +38,10 @@ export const SendNewMessage = async (data: SendNewMessagePayload) => {
       }
     })
 
-    await newMessage.save()
     await ChatModel.findByIdAndUpdate(data.chat, {
       lastMessage: newMessage._id,
       unreadCounts: existingUnreadCounts,
+      lastMessageAt: new Date().toISOString(),
     })
   } catch (error) {
     throw error
@@ -64,7 +69,9 @@ export const ReadAllMessages = async ({
       {
         chat: chatId,
         sender: { $ne: userId },
-        readBy: { $nin: [userId] },
+        readBy: {
+          $nin: [userId],
+        },
       },
       { $addToSet: { readBy: userId } },
     )

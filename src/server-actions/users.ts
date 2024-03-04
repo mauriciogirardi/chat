@@ -30,7 +30,7 @@ export const GetCurrentUserFromMongoDB = async (): Promise<UserType | null> => {
 
     const newUserPayload = {
       clerkUserId: id,
-      name: fullName.replaceAll('null', ''),
+      name: fullName,
       username,
       email: emailAddresses[0]?.emailAddress || '',
       profilePicture: imageUrl,

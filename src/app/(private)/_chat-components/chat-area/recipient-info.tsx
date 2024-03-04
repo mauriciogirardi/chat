@@ -17,7 +17,7 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
   const currentUserId = useAppSelector((state) => state.user.currentUserId)
   const selectedChat = useAppSelector((state) => state.chat.selectedChat)
 
-  const userInfo = useMemo(() => {
+  const infoChat = useMemo(() => {
     const isGroupChat = selectedChat?.isGroupChat
     let name
     let image = ''
@@ -38,14 +38,12 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
       : ''
 
     return {
-      createdOn,
       name,
       image,
-      imgPreview: name?.slice(0, 2),
-      createdBy: selectedChat?.createdBy.name,
-      isGroupChat,
+      createdOn,
+      fallbackImage: name?.slice(0.2),
     }
-  }, [selectedChat, currentUserId])
+  }, [currentUserId, selectedChat])
 
   return (
     <D.Drawer direction="left">
@@ -70,28 +68,31 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
           )}
         >
           <Avatar className="size-28">
-            <AvatarImage src={userInfo.image} className="object-cover" />
-            <AvatarFallback>{userInfo.imgPreview}</AvatarFallback>
+            <AvatarImage src={infoChat.image} className="object-cover" />
+            <AvatarFallback>{infoChat.fallbackImage}</AvatarFallback>
           </Avatar>
-          <span className="font-medium">{userInfo.name}</span>
+          <span className="font-medium">{infoChat.name}</span>
 
           <div className="mt-5 flex w-full flex-col gap-2 rounded bg-zinc-100 p-3 text-sm text-muted-foreground shadow dark:bg-zinc-900">
             <span>
-              <strong>Created By:</strong> {userInfo.createdBy}
+              <strong>Created By:</strong> {selectedChat?.createdBy.name}
             </span>
             <span>
-              <strong>Created On: </strong> {userInfo.createdOn}
+              <strong>Created On: </strong> {infoChat.createdOn}
             </span>
           </div>
 
-          {userInfo.isGroupChat && (
+          {selectedChat?.isGroupChat && (
             <div className="my-6 flex w-full flex-col justify-start gap-4">
               <div className="flex items-center justify-between border-b pb-4">
                 <p className="text-sm font-medium text-muted-foreground">
                   {selectedChat?.users.length} Members
                 </p>
                 <Button type="button" variant="secondary" size="xs" asChild>
-                  <Link href={`/groups/edit-group/${selectedChat?._id}`}>
+                  <Link
+                    href={`/groups/edit-group/${selectedChat?._id}`}
+                    className="cursor-pointer"
+                  >
                     <Pen className="mr-1 size-3" />
                     Edit group
                   </Link>

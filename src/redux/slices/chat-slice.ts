@@ -39,6 +39,10 @@ const chatSlice = createSlice({
     setSelectedChat: (state, action: PayloadAction<ChatType | null>) => {
       state.selectedChat = action.payload
     },
+
+    setChats: (state, action: PayloadAction<ChatType[]>) => {
+      state.chats = action.payload
+    },
   },
 
   extraReducers(builder) {
@@ -53,5 +57,5 @@ const chatSlice = createSlice({
   },
 })
 
-export const { setSelectedChat } = chatSlice.actions
+export const { setSelectedChat, setChats } = chatSlice.actions
 export const chat = chatSlice.reducer

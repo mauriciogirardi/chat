@@ -31,7 +31,11 @@ export function Profile() {
           </p>
           <ProfileInfo>
             <div className="group relative rounded-full">
-              <Avatar role="button" aria-label="Open profile">
+              <Avatar
+                role="button"
+                aria-label="Open profile"
+                className="bg-zinc-100 dark:bg-zinc-900"
+              >
                 <AvatarImage
                   src={currentUserData?.profilePicture}
                   className="object-cover"

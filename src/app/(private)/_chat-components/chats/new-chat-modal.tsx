@@ -2,11 +2,9 @@
 
 import { Check, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 import { twMerge } from 'tailwind-merge'
 
-import { getAllUsers } from '@/api/get-all-users'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,14 +17,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserType } from '@/interfaces/user'
-import { useAppSelector } from '@/redux'
-import { loadChats } from '@/redux/slices/chat-slice'
+import { useAppDispatch, useAppSelector } from '@/redux'
+import { setChats } from '@/redux/slices/chat-slice'
 import { CreateNewChat } from '@/server-actions/chats'
+import { GetAllUsers } from '@/server-actions/users'
 
 export function NewChatModal() {
   const currentUserId = useAppSelector((state) => state.user.currentUserId)
-  const { chats, isLoadingChats } = useAppSelector((state) => state.chat)
-  const dispatch = useDispatch()
+  const { chats } = useAppSelector((state) => state.chat)
+  const dispatch = useAppDispatch()
 
   const [users, setUsers] = useState<UserType[]>([])
   const [isLoadingUsers, setIsLoadingUsers] = useState(false)
@@ -36,7 +35,7 @@ export function NewChatModal() {
   const getUsers = async () => {
     try {
       setIsLoadingUsers(true)
-      const response = (await getAllUsers()) || []
+      const response = await GetAllUsers()
       setUsers(response)
     } catch (error) {
       toast.error('Fail loading users!')
@@ -51,13 +50,16 @@ export function NewChatModal() {
       setIsLoadingNewUser(true)
       setSelectedUserId(userId)
 
-      await CreateNewChat({
+      const newChats = await CreateNewChat({
         users: [userId, currentUserId],
         createdBy: currentUserId,
         isGroupChat: false,
       })
 
-      toast.success('Chat created successfully!')
+      const name = newChats[0].users.find((user) => user._id === userId)?.name
+
+      dispatch(setChats(newChats))
+      toast.success(`${name} has been successfully added to you chat!`)
     } catch {
       toast.error('Error adding user to new chat, try again!')
     } finally {
@@ -67,18 +69,10 @@ export function NewChatModal() {
   }
 
   useEffect(() => {
-    if (currentUserId && selectedUserId) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      dispatch(loadChats({ userId: currentUserId }))
-    }
-  }, [currentUserId, dispatch, selectedUserId])
-
-  useEffect(() => {
     getUsers()
   }, [])
 
-  const isLoadingList = isLoadingChats || isLoadingUsers
+  const isLoadingList = isLoadingUsers
 
   return (
     <Dialog>
@@ -95,7 +89,7 @@ export function NewChatModal() {
         </DialogHeader>
 
         <div className="mt-5">
-          <Input placeholder="Search userId or username or email" type="text" />
+          <Input placeholder="Search by name" type="text" />
 
           <div
             className={twMerge('mt-6 h-72', 'overflow-y-auto scrollbar-thin')}
@@ -129,7 +123,7 @@ export function NewChatModal() {
                       )}
                     >
                       <Avatar className="size-12">
-                        <AvatarImage src={''} />
+                        <AvatarImage src={user.profilePicture} />
                         <AvatarFallback className="text-sm">
                           {user.username.toUpperCase().slice(0, 2)}
                         </AvatarFallback>

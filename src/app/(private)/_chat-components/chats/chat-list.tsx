@@ -4,9 +4,11 @@ import { useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { useAppDispatch, useAppSelector } from '@/redux'
-import { loadChats } from '@/redux/slices/chat-slice'
-import { ReadAllMessages } from '@/server-actions/messages'
+import { socket } from '@/config/socket-config'
+import { filterChatByUserName } from '@/helpers/filter-chat-by-user-name'
+import { MessageType } from '@/interfaces/message'
+import { store, useAppDispatch, useAppSelector } from '@/redux'
+import { loadChats, setChats } from '@/redux/slices/chat-slice'
 
 import { ChatCard } from './chat-card'
 
@@ -15,24 +17,62 @@ type ChatListProps = {
 }
 
 export function ChatList({ onOpenChats }: ChatListProps) {
-  const { chats, isLoadingChats, selectedChat } = useAppSelector(
+  const dispatch = useAppDispatch()
+  const { currentUserData } = useAppSelector((state) => state.user)
+  const { chats, selectedChat, isLoadingChats } = useAppSelector(
     (state) => state.chat,
   )
-  const currentUserId = useAppSelector((state) => state.user.currentUserId)
-  const dispatch = useAppDispatch()
+  const search = useAppSelector((state) => state.searchFilter.search)
 
   useEffect(() => {
-    if (currentUserId) {
-      dispatch(loadChats({ userId: currentUserId }))
-    }
-  }, [currentUserId, dispatch])
+    if (currentUserData) dispatch(loadChats({ userId: currentUserData._id }))
+  }, [currentUserData, dispatch])
 
   useEffect(() => {
-    if (currentUserId && selectedChat?._id) {
-      selectedChat?._id &&
-        ReadAllMessages({ chatId: selectedChat._id, userId: currentUserId })
-    }
-  }, [selectedChat?._id, currentUserId])
+    socket.on('new-message-received', (newMessage: MessageType) => {
+      const { chats } = store.getState().chat
+      let prevChats = [...chats]
+
+      const indexOfChatToUpdate = prevChats.findIndex(
+        (chat) => chat._id === newMessage.chat._id,
+      )
+
+      if (indexOfChatToUpdate === -1) return
+
+      const chatToUpdate = prevChats[indexOfChatToUpdate]
+
+      if (
+        chatToUpdate?.lastMessage?.socketMessageId ===
+        newMessage?.socketMessageId
+      )
+        return
+
+      const chatToUpdateCopy = { ...chatToUpdate }
+      chatToUpdateCopy.lastMessage = newMessage
+      chatToUpdateCopy.updatedAt = newMessage.createdAt
+      chatToUpdateCopy.unreadCounts = { ...chatToUpdate.unreadCounts }
+
+      if (
+        currentUserData &&
+        newMessage.sender._id !== currentUserData?._id &&
+        selectedChat?._id !== newMessage.chat._id
+      ) {
+        chatToUpdateCopy.unreadCounts[currentUserData._id] =
+          (chatToUpdateCopy.unreadCounts[currentUserData._id] || 0) + 1
+      }
+
+      prevChats[indexOfChatToUpdate] = chatToUpdateCopy
+
+      // push the updated chat to the top
+      prevChats = [
+        prevChats[indexOfChatToUpdate],
+        ...prevChats.filter((chat) => chat._id !== newMessage.chat._id),
+      ]
+      dispatch(setChats(prevChats))
+    })
+  }, [selectedChat, dispatch, currentUserData])
+
+  const filterChats = filterChatByUserName(chats, search)
 
   return (
     <div
@@ -53,10 +93,25 @@ export function ChatList({ onOpenChats }: ChatListProps) {
           </div>
         ))}
 
-      {!isLoadingChats &&
-        chats.map((chat) => (
-          <ChatCard key={chat._id} chat={chat} onOpenChats={onOpenChats} />
-        ))}
+      {!isLoadingChats && (
+        <>
+          {filterChats && filterChats?.length > 0
+            ? filterChats?.map((chat) => (
+                <ChatCard
+                  key={chat._id}
+                  chat={chat}
+                  onOpenChats={onOpenChats}
+                />
+              ))
+            : chats?.map((chat) => (
+                <ChatCard
+                  key={chat._id}
+                  chat={chat}
+                  onOpenChats={onOpenChats}
+                />
+              ))}
+        </>
+      )}
     </div>
   )
 }

@@ -6,10 +6,15 @@ interface MessageData extends Document {
   readBy: Schema.Types.ObjectId[]
   text: string
   image: string
+  socketMessageId: string
 }
 
 const messageSchema = new Schema<MessageData>(
   {
+    socketMessageId: {
+      type: String,
+      default: '',
+    },
     chat: {
       type: Schema.Types.ObjectId,
       ref: 'chats',
@@ -31,6 +36,7 @@ const messageSchema = new Schema<MessageData>(
     readBy: {
       type: [Schema.Types.ObjectId],
       ref: 'users',
+      default: [],
     },
   },
   { timestamps: true },

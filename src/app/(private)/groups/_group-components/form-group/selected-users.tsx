@@ -49,6 +49,7 @@ export function SelectedUsers({
               type="button"
               size="xs"
               disabled={isDisabled}
+              className="cursor-pointer"
             >
               {hasError
                 ? 'You have to select at least one user.'

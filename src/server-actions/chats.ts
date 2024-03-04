@@ -17,7 +17,7 @@ export type ChatData = {
   unreadCounts?: object
 }
 
-export const CreateNewChat = async (data: ChatData): Promise<ChatType> => {
+export const CreateNewChat = async (data: ChatData): Promise<ChatType[]> => {
   try {
     await ChatModel.create(data)
     const newChats = await ChatModel.find({
@@ -44,7 +44,7 @@ export const GetAllChats = async (userId: string): Promise<ChatType[]> => {
       .populate('lastMessage')
       .populate('createdBy')
       .populate({ path: 'lastMessage', populate: { path: 'sender' } })
-      .sort({ updatedAt: -1 })
+      .sort({ lastMessageAt: -1 })
     return JSON.parse(JSON.stringify(usersChat))
   } catch (error) {
     throw error

@@ -1,7 +1,11 @@
+'use client'
+
 import { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { Header } from '@/components/header'
+
+import { Content } from './content'
 
 type LayoutAppProps = {
   children: ReactNode
@@ -12,7 +16,9 @@ export function LayoutApp({ children, className }: LayoutAppProps) {
   return (
     <>
       <Header />
-      <div className={twMerge('container', className)}>{children}</div>
+      <Content>
+        <div className={twMerge('container', className)}>{children}</div>
+      </Content>
     </>
   )
 }
