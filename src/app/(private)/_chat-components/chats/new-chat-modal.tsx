@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { socket } from '@/config/socket-config'
+import { useDebounce } from '@/hooks/useDebounce'
 import { UserType } from '@/interfaces/user'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { setChats } from '@/redux/slices/chat-slice'
@@ -31,6 +33,8 @@ export function NewChatModal() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(false)
   const [isLoadingNewUser, setIsLoadingNewUser] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState('')
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search)
 
   const getUsers = async () => {
     try {
@@ -56,6 +60,14 @@ export function NewChatModal() {
         isGroupChat: false,
       })
 
+      const payloadSocket = {
+        chats: newChats,
+        userId,
+        type: 'chat',
+      }
+
+      socket.emit('add-user-chat', payloadSocket)
+
       const name = newChats[0].users.find((user) => user._id === userId)?.name
 
       dispatch(setChats(newChats))
@@ -72,7 +84,13 @@ export function NewChatModal() {
     getUsers()
   }, [])
 
-  const isLoadingList = isLoadingUsers
+  const filterUser = debouncedSearch
+    ? users.filter((user) =>
+        user.name
+          .toLocaleLowerCase()
+          .includes(debouncedSearch.toLocaleLowerCase()),
+      )
+    : users
 
   return (
     <Dialog>
@@ -89,12 +107,17 @@ export function NewChatModal() {
         </DialogHeader>
 
         <div className="mt-5">
-          <Input placeholder="Search by name" type="text" />
+          <Input
+            placeholder="Search by name"
+            type="text"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
 
           <div
             className={twMerge('mt-6 h-72', 'overflow-y-auto scrollbar-thin')}
           >
-            {isLoadingList ? (
+            {isLoadingUsers ? (
               <div className="divide-y">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div className="flex items-center py-4" key={i}>
@@ -106,7 +129,7 @@ export function NewChatModal() {
               </div>
             ) : (
               <div className="divide-y">
-                {users.map((user) => {
+                {filterUser.map((user) => {
                   const chatAlreadyCreated = chats.find((chat) =>
                     chat.users.find((chatUser) => chatUser._id === user._id),
                   )
@@ -119,7 +142,7 @@ export function NewChatModal() {
                       key={user._id}
                       className={twMerge(
                         'flex items-center py-4',
-                        users.length >= 5 && 'pr-4',
+                        filterUser.length >= 5 && 'pr-4',
                       )}
                     >
                       <Avatar className="size-12">
@@ -149,6 +172,22 @@ export function NewChatModal() {
                     </div>
                   )
                 })}
+
+                {filterUser.length <= 0 && (
+                  <div className="flex h-52 items-center justify-center">
+                    <span className="text-muted-foreground">
+                      User not found!
+                    </span>
+                  </div>
+                )}
+
+                {users.length <= 0 && (
+                  <div className="flex h-52 items-center justify-center">
+                    <span className="w-48 text-center text-muted-foreground">
+                      There are no users registered in the chat yet!
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

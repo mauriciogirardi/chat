@@ -68,9 +68,10 @@ export const GetChatDataById = async (chatId: string): Promise<ChatType> => {
 export const UpdateChat = async (
   chatId: string,
   chat: ChatData,
-): Promise<void> => {
+): Promise<ChatType> => {
   try {
-    await ChatModel.findByIdAndUpdate(chatId, chat)
+    const chatUpdated = await ChatModel.findByIdAndUpdate(chatId, chat)
+    return JSON.parse(JSON.stringify(chatUpdated))
   } catch (error) {
     throw error
   }

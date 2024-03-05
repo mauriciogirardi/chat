@@ -6,6 +6,7 @@ import { twMerge } from 'tailwind-merge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { socket } from '@/config/socket-config'
 import { filterChatByUserName } from '@/helpers/filter-chat-by-user-name'
+import { ChatType } from '@/interfaces/chat'
 import { MessageType } from '@/interfaces/message'
 import { store, useAppDispatch, useAppSelector } from '@/redux'
 import { loadChats, setChats } from '@/redux/slices/chat-slice'
@@ -71,6 +72,12 @@ export function ChatList({ onOpenChats }: ChatListProps) {
       dispatch(setChats(prevChats))
     })
   }, [selectedChat, dispatch, currentUserData])
+
+  useEffect(() => {
+    socket.on('add-new-user-chat', (chats: ChatType[]) => {
+      dispatch(setChats(chats))
+    })
+  }, [dispatch])
 
   const filterChats = filterChatByUserName(chats, search)
 

@@ -150,9 +150,9 @@ export function Messages() {
       ref={messageDivRef}
       className="my-8 h-[calc(100%_-_5rem)] flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent"
     >
-      {messages.map((message) => (
-        <Message key={message._id} message={message} />
-      ))}
+      {messages.map((message) => {
+        return <Message key={message.socketMessageId} message={message} />
+      })}
     </div>
   )
 }

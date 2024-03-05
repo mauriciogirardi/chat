@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { socket } from '@/config/socket-config'
 import { uploadImageToFirebaseAndReturnURL } from '@/helpers/upload-image-to-firebase-and-return-URL.ts'
 import { ChatType } from '@/interfaces/chat'
 import { UserType } from '@/interfaces/user'
@@ -104,9 +105,19 @@ export function FormGroup({ users = [], initialData }: FormGroupProps) {
         })
       }
 
-      initialData?._id
-        ? await UpdateChat(initialData._id, chatData)
-        : await CreateNewChat(chatData)
+      if (initialData?._id) {
+        await UpdateChat(initialData._id, chatData)
+      } else {
+        const response = await CreateNewChat(chatData)
+
+        const payloadSocket = {
+          chats: response,
+          userId: currentUserId,
+          type: 'group',
+        }
+
+        socket.emit('add-user-chat', payloadSocket)
+      }
 
       toast.success(
         initialData?._id
