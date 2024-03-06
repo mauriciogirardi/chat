@@ -1,18 +1,12 @@
 import { Loader2 } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 import React, { ReactNode } from 'react'
 
 import { Logo } from '@/components/logo'
 import { useAppSelector } from '@/redux'
 
 export function Content({ children }: { children: ReactNode }) {
-  const pathname = usePathname()
-  const isPublicRoute =
-    pathname.includes('sign-in') || pathname.includes('sign-up')
-
   const { currentUserData } = useAppSelector((state) => state.user)
 
-  if (isPublicRoute) return children
   if (!currentUserData) {
     return (
       <div className="flex h-[calc(100vh_-_5rem)] w-full flex-col items-center justify-center gap-5">
