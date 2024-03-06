@@ -9,6 +9,7 @@ export function SignIn() {
 
   return (
     <SignInClerk
+      afterSignInUrl="/"
       appearance={{
         baseTheme: theme === 'dark' ? dark : undefined,
       }}
