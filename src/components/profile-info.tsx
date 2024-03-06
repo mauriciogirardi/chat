@@ -22,6 +22,7 @@ type ProfileInfoProps = {
 
 export function ProfileInfo({ children }: ProfileInfoProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false)
   const dispatch = useAppDispatch()
 
   const user = useAppSelector((state) => state.user.currentUserData)
@@ -39,7 +40,7 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
       dispatch(setCurrentUser(null))
       dispatch(setCurrentId(''))
 
-      toast.success('logged out successfully!')
+      setOpen(false)
       router.push('/sign-in')
     } catch {
       toast.error(
@@ -51,7 +52,7 @@ export function ProfileInfo({ children }: ProfileInfoProps) {
   }
 
   return (
-    <D.Drawer direction="left">
+    <D.Drawer direction="left" onOpenChange={setOpen} open={open}>
       <D.DrawerTrigger asChild className="cursor-pointer">
         {children}
       </D.DrawerTrigger>

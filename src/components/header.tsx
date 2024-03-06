@@ -33,11 +33,13 @@ export function Header() {
         <div>
           <Logo />
         </div>
-        <div className="flex items-center gap-4">
-          <Profile />
-          <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
-          <ToggleTheme />
-        </div>
+        {currentUserId && (
+          <div className="flex items-center gap-4">
+            <Profile />
+            <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
+            <ToggleTheme />
+          </div>
+        )}
       </header>
     </div>
   )

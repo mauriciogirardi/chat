@@ -1,6 +1,7 @@
 'use server'
 
 import { currentUser } from '@clerk/nextjs'
+import { redirect } from 'next/navigation'
 
 import { connectMongoDB } from '@/config/db-config'
 import { UserType } from '@/interfaces/user'
@@ -20,7 +21,7 @@ export const GetCurrentUserFromMongoDB = async (): Promise<UserType | null> => {
     }
 
     if (!clerkUser) {
-      throw new Error('ClerkUser not existis!')
+      redirect('/sign-in')
     }
 
     const { id, firstName, lastName, username, emailAddresses, imageUrl } =
