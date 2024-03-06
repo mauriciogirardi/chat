@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import React, { ReactNode } from 'react'
 
 import { Logo } from '@/components/logo'
@@ -7,7 +7,6 @@ import { useAppSelector } from '@/redux'
 
 export function Content({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
   const isPublicRoute =
     pathname.includes('sign-in') || pathname.includes('sign-up')
 
