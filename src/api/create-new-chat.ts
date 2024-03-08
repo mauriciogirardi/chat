@@ -2,7 +2,7 @@
 
 import { api } from '@/data/api'
 import { ChatType } from '@/interfaces/chat'
-import { ChatData } from '@/server-actions/chats'
+import { ChatData } from '@/interfaces/chat-data'
 
 type Response = {
   chats: ChatType[]
