@@ -33,7 +33,8 @@ export function Header() {
   }, [currentUserId, dispatch])
 
   if (client?.sessions?.length <= 0) {
-    return router.push('/sign-in')
+    router.push('/sign-in')
+    return null
   }
 
   return (
