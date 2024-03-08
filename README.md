@@ -29,28 +29,28 @@ Additionally, the system includes advanced features such as typing animation to 
 
 ## Todo
 
-[x] - Implement CLERK Authentication for sign-up and sign-in.
+- [x] Implement CLERK Authentication for sign-up and sign-in.
 
-[x] - Logged in users will be able to see all the list of users who registered in the application
+- [x] Logged in users will be able to see all the list of users who registered in the application
 
-[x] - If any user want to chat with other user , they have to add the user to chats list
+- [x] If any user want to chat with other user , they have to add the user to chats list
 
-[x] - Users can create one-to-one chat and also group chats.
+- [x] Users can create one-to-one chat and also group chats.
 
-[x] - Users can able to update their profile picture , create groups , edit groups.
+- [x] Users can able to update their profile picture , create groups , edit groups.
 
-[x] - Users can see unread messages count in chats-list for every chat.
+- [x] Users can see unread messages count in chats-list for every chat.
 
-[x] - Integrating socket io in-order to make all the chat functionalities real time.
+- [x] Integrating socket io in-order to make all the chat functionalities real time.
 
-[x] - Once the socket io is integrated , users will be able to send and receive the messages in real-time.
+- [x] Once the socket io is integrated , users will be able to send and receive the messages in real-time.
 
-[x] - Recipient users can see the typing animation if any user is typing in that chat.
+- [x] Recipient users can see the typing animation if any user is typing in that chat.
 
-[x] - Read Receipts functionality for the messages.
+- [x] Read Receipts functionality for the messages.
 
-[ ] - Add unit tests.
+- [ ] Add unit tests.
 
-[ ] - Separate the back-end from the front-end.
+- [x] Separate the back-end from the front-end.
 
-[ ] - Encrypt the messages
+- [ ] Encrypt the messages
