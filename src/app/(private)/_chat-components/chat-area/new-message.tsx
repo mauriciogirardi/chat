@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { sendNewMessage, SendNewMessagePayload } from '@/api/send-new-message'
 import { ImageSelector } from '@/components/image-selector'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,10 +22,6 @@ import { Input } from '@/components/ui/input'
 import { socket } from '@/config/socket-config'
 import { uploadImageToFirebaseAndReturnURL } from '@/helpers/upload-image-to-firebase-and-return-URL.ts'
 import { useAppSelector } from '@/redux'
-import {
-  SendNewMessage,
-  SendNewMessagePayload,
-} from '@/server-actions/messages'
 
 const Picker = dynamic(
   () => {
@@ -93,7 +90,7 @@ export function NewMessage() {
         sender: currentUserData._id,
         chat: selectedChat._id,
       }
-      await SendNewMessage(data)
+      await sendNewMessage({ data })
 
       resetField('text')
     } catch {

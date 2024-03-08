@@ -6,10 +6,10 @@ import { ChangeEvent, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 
+import { uploadUserProfile } from '@/api/upload-user-profile'
 import { storageUpload } from '@/config/firebase'
 import { useAppSelector } from '@/redux'
 import { setCurrentUser } from '@/redux/slices/user-slice'
-import { UploadUserProfile } from '@/server-actions/users'
 
 import { Avatar, AvatarImage } from './ui/avatar'
 import { Button } from './ui/button'
@@ -48,12 +48,12 @@ export function UploadFile() {
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
 
-          const userUpdate = await UploadUserProfile({
+          const userUpdate = await uploadUserProfile({
             profilePicture: downloadURL,
             userId: user._id,
           })
 
-          dispatch(setCurrentUser(userUpdate))
+          userUpdate && dispatch(setCurrentUser(userUpdate))
 
           toast.success('Profile picture updated successfully!')
           setIsLoadingProfile(false)

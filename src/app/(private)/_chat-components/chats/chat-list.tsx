@@ -79,6 +79,8 @@ export function ChatList({ onOpenChats }: ChatListProps) {
     })
   }, [dispatch])
 
+  console.log(currentUserData?._id)
+
   const filterChats = filterChatByUserName(chats, search)
 
   return (

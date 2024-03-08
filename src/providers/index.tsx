@@ -15,7 +15,7 @@ export function Providers({ children }: ProvidersProps) {
     <ReduxProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="dark"
         storageKey="theme-chat"
         enableSystem={false}
         disableTransitionOnChange

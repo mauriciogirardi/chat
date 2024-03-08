@@ -1,12 +1,18 @@
-import { toast } from 'sonner'
+'use server'
 
-import { GetAllUsers } from '@/server-actions/users'
+import { api } from '@/data/api'
+import { UserType } from '@/interfaces/user'
+
+type Response = {
+  users: UserType[]
+}
 
 export async function getAllUsers() {
   try {
-    const users = await GetAllUsers()
+    const { users } = await api<Response>('/users')
+
     return users
   } catch (error) {
-    toast.error('Fail loading users!')
+    console.error(error)
   }
 }

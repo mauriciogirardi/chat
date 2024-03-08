@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+import { getAllChats } from '@/api/get-all-chats'
 import { ChatType } from '@/interfaces/chat'
-import { GetAllChats } from '@/server-actions/chats'
 
 export type ChatState = {
   chats: ChatType[]
@@ -23,7 +23,7 @@ export const loadChats = createAsyncThunk<ChatType[] | undefined, LoadChatArgs>(
   'chat/load',
   async ({ userId }) => {
     try {
-      const data = await GetAllChats(userId)
+      const data = await getAllChats({ userId })
       return data
     } catch (error) {
       console.error(error)

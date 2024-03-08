@@ -4,11 +4,12 @@ import { Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { getChatMessages } from '@/api/get-chat-messages'
+import { readAllMessages } from '@/api/read-all-messages'
 import { socket } from '@/config/socket-config'
 import { MessageType } from '@/interfaces/message'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { setChats } from '@/redux/slices/chat-slice'
-import { GetChatMessages, ReadAllMessages } from '@/server-actions/messages'
 
 import { Message } from './message'
 
@@ -26,8 +27,8 @@ export function Messages() {
 
     try {
       setLoading(true)
-      const response = await GetChatMessages(selectedChat._id)
-      setMessages(response)
+      const response = await getChatMessages({ chatId: selectedChat._id })
+      response && setMessages(response)
     } catch (error) {
       toast.error('Error loading messages!')
     } finally {
@@ -91,6 +92,20 @@ export function Messages() {
     }
   }, [handleNewMessageReceivedEvent, handleUserReadAllChatMessagesEvent])
 
+  const handleReadAllMessages = useCallback(
+    async (userId: string, chatId: string) => {
+      try {
+        await readAllMessages({
+          userId,
+          chatId,
+        })
+      } catch {
+        toast.error('Error read all messages')
+      }
+    },
+    [],
+  )
+
   useEffect(() => {
     if (!currentUserData || !selectedChat) return undefined
     // scroll to top when new message arrives
@@ -107,10 +122,7 @@ export function Messages() {
     }
 
     if (unreadMessages > 0) {
-      ReadAllMessages({
-        userId: currentUserData._id,
-        chatId: selectedChat._id,
-      })
+      handleReadAllMessages(currentUserData._id, selectedChat._id)
 
       socket.emit('read-all-messages', {
         chatId: selectedChat._id,

@@ -2,9 +2,9 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
+import { getAllUsers } from '@/api/get-all-users'
+import { getChatById } from '@/api/get-chat-by-id'
 import { LayoutApp } from '@/layouts/app'
-import { GetChatDataById } from '@/server-actions/chats'
-import { GetAllUsers } from '@/server-actions/users'
 
 import { FormGroup } from '../../_group-components/form-group'
 
@@ -22,8 +22,8 @@ export default async function EditGroup({ params }: EditGroupProps) {
   }
 
   const [chat, users] = await Promise.all([
-    GetChatDataById(groupId),
-    GetAllUsers(),
+    getChatById({ groupId }),
+    getAllUsers(),
   ])
 
   return (

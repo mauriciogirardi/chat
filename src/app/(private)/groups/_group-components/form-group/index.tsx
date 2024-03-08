@@ -7,6 +7,8 @@ import { ChangeEvent, useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { createNewChat } from '@/api/create-new-chat'
+import { updateChat } from '@/api/update-chat'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +19,7 @@ import { ChatType } from '@/interfaces/chat'
 import { UserType } from '@/interfaces/user'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { setSelectedChat } from '@/redux/slices/chat-slice'
-import { ChatData, CreateNewChat, UpdateChat } from '@/server-actions/chats'
+import { ChatData } from '@/server-actions/chats'
 
 import { FieldForm } from './field-form'
 import { FormData, schemaForm } from './schema-form'
@@ -106,9 +108,9 @@ export function FormGroup({ users = [], initialData }: FormGroupProps) {
       }
 
       if (initialData?._id) {
-        await UpdateChat(initialData._id, chatData)
+        await updateChat({ chatId: initialData._id, data: chatData })
       } else {
-        const response = await CreateNewChat(chatData)
+        const response = await createNewChat({ data: chatData })
 
         const payloadSocket = {
           chats: response,

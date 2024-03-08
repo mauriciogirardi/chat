@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+import { getCurrentUserFromMongoDB } from '@/api/get-current-user-from-mongo-db'
 import { UserType } from '@/interfaces/user'
-import { GetCurrentUserFromMongoDB } from '@/server-actions/users'
 
 export type CurrentUserState = {
   currentUserData?: UserType | null
@@ -21,7 +21,7 @@ export const loadCurrentUser = createAsyncThunk<UserType | null | undefined>(
   'user/load',
   async () => {
     try {
-      const data = await GetCurrentUserFromMongoDB()
+      const data = await getCurrentUserFromMongoDB()
 
       return data
     } catch (error) {

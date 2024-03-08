@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { twMerge } from 'tailwind-merge'
 
+import { createNewChat } from '@/api/create-new-chat'
+import { getAllUsers } from '@/api/get-all-users'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,8 +23,6 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { UserType } from '@/interfaces/user'
 import { useAppDispatch, useAppSelector } from '@/redux'
 import { setChats } from '@/redux/slices/chat-slice'
-import { CreateNewChat } from '@/server-actions/chats'
-import { GetAllUsers } from '@/server-actions/users'
 
 export function NewChatModal() {
   const currentUserId = useAppSelector((state) => state.user.currentUserId)
@@ -39,8 +39,8 @@ export function NewChatModal() {
   const getUsers = async () => {
     try {
       setIsLoadingUsers(true)
-      const response = await GetAllUsers()
-      setUsers(response)
+      const users = await getAllUsers()
+      setUsers(users || [])
     } catch (error) {
       toast.error('Fail loading users!')
     } finally {
@@ -54,24 +54,28 @@ export function NewChatModal() {
       setIsLoadingNewUser(true)
       setSelectedUserId(userId)
 
-      const newChats = await CreateNewChat({
+      const data = {
         users: [userId, currentUserId],
         createdBy: currentUserId,
         isGroupChat: false,
-      })
-
-      const payloadSocket = {
-        chats: newChats,
-        userId,
-        type: 'chat',
       }
 
-      socket.emit('add-user-chat', payloadSocket)
+      const newChats = await createNewChat({ data })
 
-      const name = newChats[0].users.find((user) => user._id === userId)?.name
+      if (newChats) {
+        const payloadSocket = {
+          chats: newChats,
+          userId,
+          type: 'chat',
+        }
 
-      dispatch(setChats(newChats))
-      toast.success(`${name} has been successfully added to you chat!`)
+        socket.emit('add-user-chat', payloadSocket)
+
+        const name = newChats[0].users.find((user) => user._id === userId)?.name
+
+        dispatch(setChats(newChats))
+        toast.success(`${name} has been successfully added to you chat!`)
+      }
     } catch {
       toast.error('Error adding user to new chat, try again!')
     } finally {
@@ -173,8 +177,8 @@ export function NewChatModal() {
                   )
                 })}
 
-                {filterUser.length <= 0 && (
-                  <div className="flex h-52 items-center justify-center">
+                {search && filterUser.length <= 0 && (
+                  <div className="flex h-64 items-center justify-center">
                     <span className="text-muted-foreground">
                       User not found!
                     </span>
@@ -182,7 +186,7 @@ export function NewChatModal() {
                 )}
 
                 {users.length <= 0 && (
-                  <div className="flex h-52 items-center justify-center">
+                  <div className="flex h-64 items-center justify-center">
                     <span className="w-48 text-center text-muted-foreground">
                       There are no users registered in the chat yet!
                     </span>
