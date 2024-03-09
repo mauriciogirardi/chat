@@ -18,8 +18,10 @@ export function Content({ children }: { children: ReactNode }) {
   if (!currentUserData) {
     return (
       <div className="flex h-[calc(100vh_-_5rem)] w-full flex-col items-center justify-center gap-5">
-        <Loader2 className="size-10 animate-spin text-muted-foreground" />
-        <Logo />
+        <div className="flex flex-col items-center gap-3">
+          <Logo />
+          <Loader2 className="size-10 animate-spin text-muted-foreground" />
+        </div>
       </div>
     )
   }

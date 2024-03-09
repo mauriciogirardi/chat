@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -73,13 +73,23 @@ export function ChatList({ onOpenChats }: ChatListProps) {
     })
   }, [selectedChat, dispatch, currentUserData])
 
-  useEffect(() => {
-    socket.on('add-new-user-chat', (chats: ChatType[]) => {
-      dispatch(setChats(chats))
-    })
-  }, [dispatch])
+  const handleAddNewUserChatEvent = useCallback(
+    (socketChats: ChatType[]) => {
+      const { chats } = store.getState().chat
+      const prevChats = [...chats]
 
-  console.log(currentUserData?._id)
+      dispatch(setChats([...prevChats, ...socketChats]))
+    },
+    [dispatch],
+  )
+
+  useEffect(() => {
+    socket.on('add-new-user-chat', handleAddNewUserChatEvent)
+
+    return () => {
+      socket.off('add-new-user-chat', handleAddNewUserChatEvent)
+    }
+  }, [handleAddNewUserChatEvent])
 
   const filterChats = filterChatByUserName(chats, search)
 

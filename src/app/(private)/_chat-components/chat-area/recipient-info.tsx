@@ -14,7 +14,7 @@ type RecipientInfoProps = {
 }
 
 export function RecipientInfo({ children }: RecipientInfoProps) {
-  const currentUserId = useAppSelector((state) => state.user.currentUserId)
+  const { currentUserId, onlineUsers } = useAppSelector((state) => state.user)
   const selectedChat = useAppSelector((state) => state.chat.selectedChat)
 
   const infoChat = useMemo(() => {
@@ -37,11 +37,16 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
       ? format(selectedChat.createdAt, "dd MMMM yyyy ',' p")
       : ''
 
+    const findCreatedBy = selectedChat?.users.find(
+      (user) => user._id !== currentUserId,
+    )
+
     return {
       name,
       image,
       createdOn,
       fallbackImage: name?.slice(0.2),
+      createdBy: findCreatedBy?.name || '',
     }
   }, [currentUserId, selectedChat])
 
@@ -75,7 +80,7 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
 
           <div className="mt-5 flex w-full flex-col gap-2 rounded bg-zinc-100 p-3 text-sm text-muted-foreground shadow dark:bg-zinc-900">
             <span>
-              <strong>Created By:</strong> {selectedChat?.createdBy.name}
+              <strong>Created By:</strong> {infoChat.createdBy}
             </span>
             <span>
               <strong>Created On: </strong> {infoChat.createdOn}
@@ -98,17 +103,27 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
                   </Link>
                 </Button>
               </div>
-              {selectedChat?.users.map((user) => (
-                <div key={user._id} className="flex items-center gap-2">
-                  <Avatar>
-                    <AvatarImage
-                      src={user.profilePicture}
-                      className="object-cover"
-                    />
-                  </Avatar>
-                  <span className="text-sm">{user.name}</span>
-                </div>
-              ))}
+              {selectedChat?.users.map((user) => {
+                const onlineIndicator = () => {
+                  if (onlineUsers.includes(user._id)) {
+                    return <div className="h-2 w-2 rounded-full bg-lime-500" />
+                  }
+                }
+
+                return (
+                  <div key={user._id} className="flex items-center gap-2">
+                    <Avatar>
+                      <AvatarImage
+                        src={user.profilePicture}
+                        className="object-cover"
+                      />
+                    </Avatar>
+                    <span className="flex items-center gap-1 text-sm">
+                      {user.name} {onlineIndicator()}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           )}
         </div>

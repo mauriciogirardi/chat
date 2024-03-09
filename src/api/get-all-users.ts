@@ -9,7 +9,7 @@ type Response = {
 
 export async function getAllUsers() {
   try {
-    const { users } = await api<Response>('/users')
+    const { users } = await api<Response>('/users', { cache: 'no-store' })
 
     return users
   } catch (error) {

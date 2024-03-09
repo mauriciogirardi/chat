@@ -25,7 +25,7 @@ import { useAppDispatch, useAppSelector } from '@/redux'
 import { setChats } from '@/redux/slices/chat-slice'
 
 export function NewChatModal() {
-  const currentUserId = useAppSelector((state) => state.user.currentUserId)
+  const { currentUserId, onlineUsers } = useAppSelector((state) => state.user)
   const { chats } = useAppSelector((state) => state.chat)
   const dispatch = useAppDispatch()
 
@@ -64,7 +64,7 @@ export function NewChatModal() {
 
       if (newChats) {
         const payloadSocket = {
-          chats: newChats,
+          chats: newChats.filter((chat) => !chat.isGroupChat),
           userId,
           type: 'chat',
         }
@@ -135,11 +135,22 @@ export function NewChatModal() {
               <div className="divide-y">
                 {filterUser.map((user) => {
                   const chatAlreadyCreated = chats.find((chat) =>
-                    chat.users.find((chatUser) => chatUser._id === user._id),
+                    chat.users.find(
+                      (chatUser) =>
+                        chatUser._id === user._id && !chat.isGroupChat,
+                    ),
                   )
 
                   if (user._id === currentUserId || chatAlreadyCreated)
                     return null
+
+                  const onlineIndicator = () => {
+                    if (onlineUsers.includes(user._id)) {
+                      return (
+                        <div className="h-2 w-2 rounded-full bg-lime-500" />
+                      )
+                    }
+                  }
 
                   return (
                     <div
@@ -155,8 +166,8 @@ export function NewChatModal() {
                           {user.username.toUpperCase().slice(0, 2)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="ml-2 pr-5 text-sm">
-                        {user.name ? user.name : user.username}
+                      <span className="ml-2 flex items-center gap-1 pr-5 text-sm">
+                        {user.name} {onlineIndicator()}
                       </span>
                       <Button
                         size="xs"
@@ -181,14 +192,6 @@ export function NewChatModal() {
                   <div className="flex h-64 items-center justify-center">
                     <span className="text-muted-foreground">
                       User not found!
-                    </span>
-                  </div>
-                )}
-
-                {users.length <= 0 && (
-                  <div className="flex h-64 items-center justify-center">
-                    <span className="w-48 text-center text-muted-foreground">
-                      There are no users registered in the chat yet!
                     </span>
                   </div>
                 )}

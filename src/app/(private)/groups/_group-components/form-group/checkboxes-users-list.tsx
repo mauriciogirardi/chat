@@ -49,6 +49,7 @@ export function CheckboxesUsersList({
       >
         {users?.map((user) => {
           if (user._id === currentUserId) return null
+
           return (
             <div
               className="mt-6 flex items-center space-x-3 pl-3"
