@@ -45,19 +45,10 @@ export function NewMessage() {
   const [openEmoji, setOpenEmoji] = useState(false)
   const { theme } = useTheme()
 
-  const {
-    register,
-    handleSubmit,
-    resetField,
-    watch,
-    setValue,
-    getValues,
-    setFocus,
-  } = useForm<FormData>({
-    resolver: zodResolver(formDataSchema),
-  })
-
-  setFocus('text', { shouldSelect: true })
+  const { register, handleSubmit, resetField, watch, setValue, getValues } =
+    useForm<FormData>({
+      resolver: zodResolver(formDataSchema),
+    })
 
   const handleSelectEmoji = ({ emoji }: EmojiClickData) => {
     const currentValue = getValues('text')
@@ -140,25 +131,27 @@ export function NewMessage() {
 
   return (
     <footer className="flex items-center gap-3">
-      <DropdownMenu open={openEmoji} onOpenChange={setOpenEmoji}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            type="button"
-            size="icon"
-            className="w-16 cursor-pointer"
-            aria-label="Choose an emoji"
-          >
-            <SmilePlus className="size-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <Picker
-            onEmojiClick={handleSelectEmoji}
-            theme={theme === 'light' ? Theme.LIGHT : Theme.DARK}
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="hidden md:block">
+        <DropdownMenu open={openEmoji} onOpenChange={setOpenEmoji}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              type="button"
+              size="icon"
+              className="w-16 cursor-pointer"
+              aria-label="Choose an emoji"
+            >
+              <SmilePlus className="size-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <Picker
+              onEmojiClick={handleSelectEmoji}
+              theme={theme === 'light' ? Theme.LIGHT : Theme.DARK}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <ImageSelector onChangeFile={setImageFile} onSend={handleSendImage}>
         <Button
@@ -189,7 +182,7 @@ export function NewMessage() {
           variant="secondary"
           type="submit"
           size="icon"
-          className="w-20"
+          className="hidden w-20 md:flex"
           aria-label="Send message"
         >
           <Send className="size-5" />

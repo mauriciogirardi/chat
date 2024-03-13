@@ -1,6 +1,6 @@
 'use server'
 
-import { currentUser } from '@clerk/nextjs'
+import { currentUser, redirectToSignIn } from '@clerk/nextjs'
 
 import { api } from '@/data/api'
 import { UserType } from '@/interfaces/user'
@@ -14,6 +14,7 @@ export async function getCurrentUserFromMongoDB() {
     const clerkUser = await currentUser()
 
     if (!clerkUser) {
+      redirectToSignIn()
       throw new Error('Not have clerk user!')
     }
 
@@ -25,7 +26,7 @@ export async function getCurrentUserFromMongoDB() {
       name: firstName + ' ' + lastName,
       username,
       email: emailAddresses[0]?.emailAddress || '',
-      profilePicture: imageUrl,
+      profilePicture: imageUrl || '',
     }
 
     const { user } = await api<Response>('/users', {

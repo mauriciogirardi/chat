@@ -54,7 +54,7 @@ export function RecipientInfo({ children }: RecipientInfoProps) {
     <D.Drawer direction="left">
       <D.DrawerTrigger asChild>{children}</D.DrawerTrigger>
 
-      <D.DrawerContent className="h-screen w-4/5 border dark:border-r-zinc-800 md:w-96">
+      <D.DrawerContent className="h-screen w-full border dark:border-r-zinc-800 md:w-96">
         <D.DrawerHeader className="px-0">
           <div className="flex items-center justify-between border-b px-6 pb-7 pt-4">
             <D.DrawerTitle className="text-muted-foreground">

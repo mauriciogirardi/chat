@@ -30,7 +30,7 @@ export function Recipient() {
           }
         }
 
-        setTimeout(() => setTyping(false), 1000)
+        setTimeout(() => setTyping(false), 2000)
       },
     )
 
