@@ -27,6 +27,9 @@ Additionally, the system includes advanced features such as typing animation to 
 ![alt text](.github/images/image-2.png)
 ![alt text](.github/images/image-5.png)
 
+## Backend
+[backend](https://github.com/mauriciogirardi/chat-api)
+
 ## Todo
 
 - [x] Implement CLERK Authentication for sign-up and sign-in.
